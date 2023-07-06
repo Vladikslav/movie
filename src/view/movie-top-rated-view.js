@@ -16,18 +16,19 @@ const createMovieTopRatedTemplate = () => `
         </div>
     </section>`;
 export default class MovieCardTopRatedView {
-  getTemplate() {
+  #element = null;
+  get template() {
     return createMovieTopRatedTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
     return this.element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
