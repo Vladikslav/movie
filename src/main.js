@@ -2,7 +2,7 @@ import MovieHeaderProfileView from './view/movie-profile-view.js';
 import MovieFilterView from './view/movie-filter-view.js';
 import MovieFooterStatisticsView from './view/movie-footer-statistic-view.js';
 import MoviePresenter from './presenter/movie-presenter.js';
-import { render } from './render.js';
+import { render } from './framework/render.js';
 import MoviesModel from './model/movie-model.js';
 import CommentsModel from './model/comment-model.js';
 

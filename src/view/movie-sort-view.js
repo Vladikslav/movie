@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const createMovieSortTemplate = () => `
   <ul class="sort">
@@ -8,20 +8,8 @@ const createMovieSortTemplate = () => `
   </ul>
 `;
 
-export default class MovieSortView {
-  #element = null;
+export default class MovieSortView extends AbstractView {
   get template() {
     return createMovieSortTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

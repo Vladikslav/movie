@@ -1,6 +1,7 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { movieCardControll } from './movie-card-controll-view.js';
 import { movieCardInfo } from './movie-card-info-view.js';
+
 const createMovieMostCommentedTemplate = () => `
     <section class="films-list films-list--extra">
         <h2 class="films-list__title">Most commented</h2>
@@ -15,20 +16,8 @@ const createMovieMostCommentedTemplate = () => `
             </article>   
         </div>
     </section>`;
-export default class MovieMostCommentedView {
-  #element = null;
+export default class MovieMostCommentedView extends AbstractView {
   get template() {
     return createMovieMostCommentedTemplate();
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }

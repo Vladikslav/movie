@@ -1,9 +1,10 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { createMovieDetailCommentsTemplate } from './movie-details-comment-view.js';
 import { createMovieDetailControllTemplate } from './movie-details-control-view.js';
 import { createMovieDetailFormTemplate } from './movie-details-form-view.js';
 import { createMovieDetailsTemplate } from './movie-details-popup-view.js';
-const createCardPopupTemplate = ({movieInfo}, comments) => `
+
+const createCardPopupTemplate = ({ movieInfo }, comments) => `
 <section class="film-details">
   <form class="film-details__inner" action="" method="get">
     <div class="film-details__top-container">
@@ -25,25 +26,26 @@ const createCardPopupTemplate = ({movieInfo}, comments) => `
 </section>
 `;
 
-export default class MovieCardPopupView {
-  #element = null;
+export default class MovieCardPopupView extends AbstractView {
+  #movie = null;
+  #comments = null;
   constructor(movie, comments) {
-    this.movie = movie;
-    this.comments = comments;
+    super();
+    this.#movie = movie;
+    this.#comments = comments;
   }
 
   get template() {
-    return createCardPopupTemplate(this.movie, this.comments);
+    return createCardPopupTemplate(this.#movie, this.#comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setClickClosePopup = (callback) => {
+    this._callback.closeClick = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#closeClickHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #closeClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.closeClick();
+  };
 }

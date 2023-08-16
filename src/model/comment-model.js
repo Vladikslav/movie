@@ -1,5 +1,5 @@
 import {generateComments} from '../mock/comment.js';
-
+/*экспорт класса модели комментарий к фильму по умолчанию*/
 export default class CommentsModel {
   #moviesModel = null;
   #allComments = [];
