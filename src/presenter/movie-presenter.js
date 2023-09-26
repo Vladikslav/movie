@@ -3,26 +3,30 @@ import MovieSortView from '../view/movie-sort-view.js';
 import MovieButtonMoreView from '../view/movie-button-more-view.js';
 import MovieListView from '../view/movie-list-view.js';
 import MovieListContainerView from '../view/movies-list-container-view.js';
-import MovieCardView from '../view/movie-card-view.js';
+import CardMoviePresenter from './card-presenter.js';
+
+
 import EmptyMovieListView from '../view/empty-movie-list-view.js';
 
 //import MovieCardTopRatedView from '../view/movie-top-rated-view.js';
 //import MovieMostCommentedView from '../view/movie-most-commented-view.js';
-import MovieCardPopupView from '../view/movie-popup-view.js';
-import { render, remove } from '../framework/render.js';
+
+import { render, RenderPosition, remove } from '../framework/render.js';
 
 const MOVIE_COUNT_STEP = 5;
 
 export default class MoviePresenter {
-  #movieComponent = new MovieView();
-  #movieListComponent = new MovieListView();
-  #movieListContainerComponent = new MovieListContainerView();
   #movieContainer = null;
   #moviesModel = null;
   #commentsModel = null;
+  #movieComponent = new MovieView();
+  #movieListComponent = new MovieListView();
+  #movieListContainerComponent = new MovieListContainerView();
+  #movieSortView = new MovieSortView();
+  #movieEmptyListView = new EmptyMovieListView();
   #loadShowMoreButtonComponent = new MovieButtonMoreView();
   #renderCardMovieCount = MOVIE_COUNT_STEP;
-  #movies = [];
+  #moviesArray = [];
   constructor(movieContainer, moviesModel, commentsModel) {
     this.#movieContainer = movieContainer;
     this.#moviesModel = moviesModel;
@@ -30,57 +34,72 @@ export default class MoviePresenter {
   }
 
   init = () => {
-    render(new MovieSortView(), this.#movieContainer);
-    render(this.#movieComponent, this.#movieContainer);
-    render(this.#movieListComponent, this.#movieComponent.element);
-    render(this.#movieListContainerComponent, this.#movieListComponent.element);
-    this.#movies = [...this.#moviesModel.movies];
-    if (this.#movies.every((movie) => movie.isArchive)) {
-      render(new EmptyMovieListView(), this.#movieListComponent.element);
-    }
-    else {
-      for (let i = 0; i < Math.min(this.#movies.length, MOVIE_COUNT_STEP); i++) {
-        this.#renderCard(this.#movies[i]);
-      }
-      if (this.#movies.length > MOVIE_COUNT_STEP) {
-        render(this.#loadShowMoreButtonComponent, this.#movieListComponent.element);
-        this.#loadShowMoreButtonComponent.setClickHandler(this.#handleLoadMoreShowButtonClick);
-      }
-    }
+
+    this.#moviesArray = [...this.#moviesModel.movies];
+    this.#renderMovies();
   };
+
+
+  /*Метод для сортировки фильмов*/
+
+  #renderSort = () => {
+    render(this.#movieSortView, this.#movieComponent.element, RenderPosition.BEFOREBEGIN);
+  };
+  /*Метод по созданию заголовка, если отсутствуют карточки товара*/
+
+  #renderNoMovies = () => {
+    render(this.#movieEmptyListView, this.#movieListComponent.element);
+  };
+
+  /*Метод по подгрузки карточек фильма при клике на кнопку показать еще*/
 
   #handleLoadMoreShowButtonClick = () => {
-    this.#movies.slice(this.#renderCardMovieCount, this.#renderCardMovieCount + MOVIE_COUNT_STEP).forEach((movie) => this.#renderCard(movie));
+    this.#moviesArray.slice(this.#renderCardMovieCount, this.#renderCardMovieCount + MOVIE_COUNT_STEP).forEach((movie) => this.#renderCard(movie));
     this.#renderCardMovieCount += MOVIE_COUNT_STEP;
-    if (this.#renderCardMovieCount >= this.#movies.length) {
+    if (this.#renderCardMovieCount >= this.#moviesArray.length) {
       remove(this.#loadShowMoreButtonComponent);
+    }
+
+  };
+
+  #renderLoadShowMoreButton = () => {
+    render(this.#loadShowMoreButtonComponent, this.#movieListComponent.element);
+    this.#loadShowMoreButtonComponent.setClickHandler(this.#handleLoadMoreShowButtonClick);
+  };
+
+  #renderCards = (from, to) => {
+    this.#moviesArray.slice(from, to).forEach((element) => {
+      this.#renderCard(element);
+    });
+  };
+
+  #renderMoviesContainer = () => {
+    render(this.#movieListContainerComponent, this.#movieListComponent.element);
+    /*Проходим циклом по готовому массиву и создаем карточки с фильмами*/
+    this.#renderCards(0, Math.min(this.#moviesArray.length, MOVIE_COUNT_STEP));
+    /*Проверяем условия в котором смотрим что, если карточек больше чем указано в константе, добавляем кнопку показать еще*/
+    if (this.#moviesArray.length > MOVIE_COUNT_STEP) {
+      this.#renderLoadShowMoreButton();
     }
   };
 
+
+  /*Метод по созданию карточки фильма*/
   #renderCard = (movie) => {
-    const movieCardComponent = new MovieCardView(movie);
-    const comments = [...this.#commentsModel.get(movie)];
-    const moviePoppupComponent = new MovieCardPopupView(movie, comments);
-    const removeChildPopup = () => {
-      remove(moviePoppupComponent);
-      this.#movieContainer.parentElement.classList.remove('hide-overflow');
-    };
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        removeChildPopup();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-    const appendChildPopup = () => {
-      this.#movieContainer.parentElement.appendChild(moviePoppupComponent.element, movieCardComponent.element);
-      this.#movieContainer.parentElement.classList.add('hide-overflow');
-      document.addEventListener('keydown', onEscKeyDown);
-      moviePoppupComponent.setClickClosePopup(() => removeChildPopup());
-    };
-    movieCardComponent.setClickOpenPopup(() => {
-      appendChildPopup();
-    });
-    render(movieCardComponent, this.#movieListContainerComponent.element);
+    const cardMoviePresenter = new CardMoviePresenter(this.#commentsModel, this.#movieContainer, this.#movieListContainerComponent);
+    cardMoviePresenter.init(movie);
+  };
+
+  #renderMovies = () => {
+    render(this.#movieComponent, this.#movieContainer);
+    render(this.#movieListComponent, this.#movieComponent.element);
+    /*Проходимся по массиву и если пустой, добавляем заголовок с отсутсвием карточке фильмов*/
+
+    if (this.#moviesArray.every((movie) => movie.isArchive)) {
+      this.#renderNoMovies();
+      return;
+    }
+    this.#renderSort();
+    this.#renderMoviesContainer();
   };
 }

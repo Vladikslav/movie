@@ -1,4 +1,4 @@
-import { formatStringToDateWithTime } from '../util.js';
+import { formatStringToDateWithTime } from '../utils/movies.js';
 const createCommentDetailTemplate = ({ emotion, comment, author, date }) => `
   <li class="film-details__comment">
   <span class="film-details__comment-emoji">

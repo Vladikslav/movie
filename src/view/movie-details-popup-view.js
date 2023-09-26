@@ -1,4 +1,4 @@
-import {formatStringToDate, formatMinutesToTime} from '../util.js';
+import {formatStringToDate, formatMinutesToTime} from '../utils/movies.js';
 const generateGenreTitle = (genre) => genre.length > 1 ? 'Genres': 'Genre';
 const generateGenreList = (genres) => genres.map((item) => `<span class="film-details__genre">${item}</span>`).join('');
 const generateNameList = (names) => names.length < 1 ? names[0] : names.join(', ');

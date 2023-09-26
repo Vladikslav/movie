@@ -1,4 +1,4 @@
-import {formatStringToYear, formatMinutesToTime} from '../util.js';
+import {formatStringToYear, formatMinutesToTime} from '../utils/movies.js';
 
 export const movieCardInfo = ({title, totalRating, release, runtime, genre, poster, description}, comments) =>
   ` <a class="film-card__link">

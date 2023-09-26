@@ -1,4 +1,4 @@
-import {generateComments} from '../mock/comment.js';
+import { generateComments } from '../mock/comment.js';
 /*экспорт класса модели комментарий к фильму по умолчанию*/
 export default class CommentsModel {
   #moviesModel = null;
@@ -9,6 +9,7 @@ export default class CommentsModel {
     this.#moviesModel = moviesModel;
     this.generateAllComments();
   }
+  /*метод класса для генерации комментарий из моковых данных комментарий */
 
   generateAllComments() {
     this.#allComments = generateComments(this.#moviesModel.movies);

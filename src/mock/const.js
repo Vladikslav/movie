@@ -101,6 +101,13 @@ const comment = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras a
 
 const countries = ['USA', 'Russia', 'Germany', 'Finland', 'France', 'Spain', 'Italy', 'China', 'Japan'];
 
+const FilterType = {
+  all: 'All movies',
+  watchlist: 'Watchlist',
+  history: 'History',
+  favorites: 'Favorites'
+};
+
 export {
   NAME_COUNT,
   MAX_COMMENTS_ON_FILM,
@@ -118,5 +125,6 @@ export {
   emotions,
   description,
   comment,
-  countries
+  countries,
+  FilterType
 };
